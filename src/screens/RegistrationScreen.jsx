@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, Image, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, SafeAreaView, Image, View, Text, TextInput, Alert, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import { FormButton } from "../components/FornButton";
@@ -13,53 +13,75 @@ export const RegistrationScreen = () => {
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
     const [focusedInput, setFocusedInput] = useState(null);
 
+    const onSignUp = () => {
+        if (email === '' || passwd === '' || login === '') {
+            Alert.alert('Something is missed');
+            return;
+        }
+        Alert.alert(`data: login - ${login}, email - ${email}, passwd - ${passwd}`);
+        setEmail('');
+        setPasswd('');
+        setLogin('');
+    }
+
     return (
-        <SafeAreaView style={styles.container}>
-            <Background>
-                <View style={styles.wrapper}>
-                    <View style={styles.avatar}>
-                        <Image
-                            source={null}
-                            style={styles.imageAvatar} />
-                        <TouchableOpacity
-                            style={styles.icon}>
-                            <Ionicons name="add-circle-outline"
-                                size={25}
-                                color={'#FF6C00'} />
-                        </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <SafeAreaView style={styles.container}>
+                <Background>
+                    <View style={styles.wrapper}>
+                        <View style={styles.avatar}>
+                            <Image
+                                source={null}
+                                style={styles.imageAvatar} />
+                            <TouchableOpacity
+                                style={styles.icon}>
+                                <Ionicons name="add-circle-outline"
+                                    size={25}
+                                    color={'#FF6C00'} />
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={styles.title}>Реєстрація</Text>
+                        <View style={styles.form}>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                                <TextInput
+                                    style={[styles.input, focusedInput === 'login' && styles.blurBorder]}
+                                    keyboardType="default"
+                                    placeholder="Логін"
+                                    placeholderTextColor={'#E8E8E8'}
+                                    onChangeText={setLogin}
+                                    value={login}
+                                    onFocus={() => setFocusedInput('login')}
+                                    onBlur={() => setFocusedInput(null)} />
+                            </KeyboardAvoidingView>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                                <EmailInput
+                                    value={email}
+                                    changeMethod={setEmail}
+                                    onFocus={() => setFocusedInput('email')}
+                                    onBlur={() => setFocusedInput(null)}
+                                    focusedInput={focusedInput} />
+                            </KeyboardAvoidingView>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                                <PasswordInput
+                                    changeMethod={setPasswd}
+                                    value={passwd}
+                                    isPasswordHidden={isPasswordHidden}
+                                    showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
+                                    onFocus={() => setFocusedInput('password')}
+                                    onBlur={() => setFocusedInput(null)}
+                                    focusedInput={focusedInput}
+                                />
+                            </KeyboardAvoidingView>
+                        </View>
+                        <FormButton text={'Зареєструватися'} method={onSignUp} />
+                        <Text style={styles.link}>Вже є акаунт? Увійти</Text>
                     </View>
-                    <Text style={styles.title}>Реєстрація</Text>
-                    <View style={styles.form}>
-                        <TextInput
-                            style={[styles.input, focusedInput === 'login' && styles.blurBorder]}
-                            keyboardType="default"
-                            placeholder="Логін"
-                            placeholderTextColor={'#E8E8E8'}
-                            onChangeText={setLogin}
-                            value={login} 
-                            onFocus={() => setFocusedInput('login')}
-                            onBlur={() => setFocusedInput(null)}/>
-                        <EmailInput
-                            value={email}
-                            changeMethod={setEmail} 
-                            onFocus={() => setFocusedInput('email')}
-                            onBlur={() => setFocusedInput(null)}
-                            focusedInput={focusedInput}/>
-                        <PasswordInput
-                            changeMethod={setPasswd}
-                            value={passwd}
-                            isPasswordHidden={isPasswordHidden}
-                            showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
-                            onFocus={() => setFocusedInput('password')}
-                            onBlur={() => setFocusedInput(null)}
-                            focusedInput={focusedInput}
-                        />
-                    </View>
-                    <FormButton text={'Зареєструватися'} method={() => console.log('hi')} />
-                    <Text style={styles.link}>Вже є акаунт? Увійти</Text>
-                </View>
-            </Background>
-        </SafeAreaView>
+                </Background>
+            </SafeAreaView>
+        </TouchableWithoutFeedback>
     )
 };
 
@@ -68,7 +90,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     wrapper: {
-        height: '70%',
         backgroundColor: 'white',
         paddingTop: 92,
         paddingBottom: 78,

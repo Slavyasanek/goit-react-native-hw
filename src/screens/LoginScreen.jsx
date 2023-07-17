@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, View, Text } from "react-native";
+import { SafeAreaView, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Alert } from "react-native";
 import { Background } from "../components/Background";
 import { FormButton } from "../components/FornButton";
 import { EmailInput } from "../components/EmailInput";
@@ -11,32 +11,51 @@ export const LoginScreen = () => {
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
     const [focusedInput, setFocusedInput] = useState(null);
 
-    return (<SafeAreaView style={styles.container}>
-        <Background>
-            <View style={styles.wrapper}>
-                <Text style={styles.title}>Увійти</Text>
-                <View style={styles.form}>
-                    <EmailInput
-                        value={email}
-                        changeMethod={setEmail}
-                        onFocus={() => setFocusedInput('email')}
-                        onBlur={() => setFocusedInput(null)}
-                        focusedInput={focusedInput} />
-                    <PasswordInput
-                        changeMethod={setPasswd}
-                        value={passwd}
-                        isPasswordHidden={isPasswordHidden}
-                        showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
-                        onFocus={() => setFocusedInput('password')}
-                        onBlur={() => setFocusedInput(null)}
-                        focusedInput={focusedInput}
-                    />
-                </View>
-                <FormButton text={'Увійти'} method={() => console.log('hi')} />
-                <Text style={styles.link}>Немає акаунту? Зареєструватися</Text>
-            </View>
-        </Background>
-    </SafeAreaView>)
+    const onLogin = () => {
+        if (email === '' || passwd === '') {
+            Alert.alert('Something is missed');
+            return;
+        }
+        Alert.alert(`data: email - ${email}, passwd - ${passwd}`);
+        setEmail('');
+        setPasswd('');
+    }
+
+    return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <SafeAreaView style={styles.container}>
+                <Background>
+                    <View style={styles.wrapper}>
+                        <Text style={styles.title}>Увійти</Text>
+                        <View style={styles.form}>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                                <EmailInput
+                                    value={email}
+                                    changeMethod={setEmail}
+                                    onFocus={() => setFocusedInput('email')}
+                                    onBlur={() => setFocusedInput(null)}
+                                    focusedInput={focusedInput} />
+                            </KeyboardAvoidingView>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                                <PasswordInput
+                                    changeMethod={setPasswd}
+                                    value={passwd}
+                                    isPasswordHidden={isPasswordHidden}
+                                    showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
+                                    onFocus={() => setFocusedInput('password')}
+                                    onBlur={() => setFocusedInput(null)}
+                                    focusedInput={focusedInput}
+                                />
+                            </KeyboardAvoidingView>
+                        </View>
+                        <FormButton text={'Увійти'} method={onLogin} />
+                        <Text style={styles.link}>Немає акаунту? Зареєструватися</Text>
+                    </View>
+                </Background>
+            </SafeAreaView>
+        </TouchableWithoutFeedback>)
 };
 
 const styles = StyleSheet.create({
@@ -44,10 +63,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     wrapper: {
-        height: '60%',
         backgroundColor: 'white',
         paddingTop: 32,
-        paddingBottom: 144,
+        paddingBottom: 111,
         paddingRight: 15,
         paddingLeft: 16,
         position: 'relative',
