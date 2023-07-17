@@ -4,15 +4,17 @@ export const PasswordInput = ({
     changeMethod,
     value,
     isPasswordHidden,
-    showPasswd }) => {
+    showPasswd, onBlur, onFocus, focusedInput }) => {
     return (<View style={styles.loginContainer}>
         <TextInput
-            style={styles.input}
+            style={[styles.input, focusedInput === 'password' && styles.blurBorder]}
             placeholderTextColor={'#E8E8E8'}
             placeholder="Пароль"
             onChangeText={changeMethod}
             value={value}
-            secureTextEntry={isPasswordHidden} />
+            secureTextEntry={isPasswordHidden}
+            onBlur={onBlur}
+            onFocus={onFocus} />
         <TouchableOpacity onPress={showPasswd} style={styles.showBtn}>
             <Text style={styles.showText}>
                 {isPasswordHidden ? 'Показати' : 'Приховати'}</Text>
@@ -37,7 +39,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F6F6F6'
     },
     blurBorder: {
-        borderColor: '#FF6C00'
+        borderColor: '#FF6C00',
+        backgroundColor: '#ffffff'
     },
     showBtn: {
         position: 'absolute',

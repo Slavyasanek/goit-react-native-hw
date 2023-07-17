@@ -11,6 +11,7 @@ export const RegistrationScreen = () => {
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+    const [focusedInput, setFocusedInput] = useState(null);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -22,28 +23,36 @@ export const RegistrationScreen = () => {
                             style={styles.imageAvatar} />
                         <TouchableOpacity
                             style={styles.icon}>
-                            <Ionicons name="add"
-                                size={20}
+                            <Ionicons name="add-circle-outline"
+                                size={25}
                                 color={'#FF6C00'} />
                         </TouchableOpacity>
                     </View>
                     <Text style={styles.title}>Реєстрація</Text>
                     <View style={styles.form}>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, focusedInput === 'login' && styles.blurBorder]}
                             keyboardType="default"
                             placeholder="Логін"
                             placeholderTextColor={'#E8E8E8'}
                             onChangeText={setLogin}
-                            value={login} />
+                            value={login} 
+                            onFocus={() => setFocusedInput('login')}
+                            onBlur={() => setFocusedInput(null)}/>
                         <EmailInput
                             value={email}
-                            changeMethod={setEmail} />
+                            changeMethod={setEmail} 
+                            onFocus={() => setFocusedInput('email')}
+                            onBlur={() => setFocusedInput(null)}
+                            focusedInput={focusedInput}/>
                         <PasswordInput
                             changeMethod={setPasswd}
                             value={passwd}
                             isPasswordHidden={isPasswordHidden}
                             showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
+                            onFocus={() => setFocusedInput('password')}
+                            onBlur={() => setFocusedInput(null)}
+                            focusedInput={focusedInput}
                         />
                     </View>
                     <FormButton text={'Зареєструватися'} method={() => console.log('hi')} />
@@ -91,15 +100,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: -12,
         bottom: 14,
-        borderRadius: 50,
-        borderColor: '#FF6C00',
-        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
         width: 25,
         height: 25,
         zIndex: 99,
-        backgroundColor: '#F6F6F6',
+        backgroundColor: '#FFFFFF',
     },
     title: {
         color: '#212121',
@@ -110,7 +116,7 @@ const styles = StyleSheet.create({
     },
     form: {
         flexDirection: 'column',
-        rowGap: 8,
+        rowGap: 16,
         marginBottom: 33,
     },
     input: {
@@ -130,5 +136,9 @@ const styles = StyleSheet.create({
         color: '#1B4371',
         textAlign: 'center',
         marginTop: 16,
-    }
+    },
+    blurBorder: {
+        borderColor: '#FF6C00',
+        backgroundColor: '#ffffff'
+    },
 })

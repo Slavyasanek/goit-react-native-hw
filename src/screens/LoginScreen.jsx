@@ -9,6 +9,7 @@ export const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+    const [focusedInput, setFocusedInput] = useState(null);
 
     return (<SafeAreaView style={styles.container}>
         <Background>
@@ -17,12 +18,18 @@ export const LoginScreen = () => {
                 <View style={styles.form}>
                     <EmailInput
                         value={email}
-                        changeMethod={setEmail} />
+                        changeMethod={setEmail}
+                        onFocus={() => setFocusedInput('email')}
+                        onBlur={() => setFocusedInput(null)}
+                        focusedInput={focusedInput} />
                     <PasswordInput
                         changeMethod={setPasswd}
                         value={passwd}
                         isPasswordHidden={isPasswordHidden}
                         showPasswd={() => setIsPasswordHidden(!isPasswordHidden)}
+                        onFocus={() => setFocusedInput('password')}
+                        onBlur={() => setFocusedInput(null)}
+                        focusedInput={focusedInput}
                     />
                 </View>
                 <FormButton text={'Увійти'} method={() => console.log('hi')} />

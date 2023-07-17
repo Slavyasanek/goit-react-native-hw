@@ -1,14 +1,16 @@
 import { StyleSheet, TextInput } from "react-native";
 
-export const EmailInput = ({ value, changeMethod }) => {
+export const EmailInput = ({ value, changeMethod, onBlur, onFocus, focusedInput }) => {
     return (<>
         <TextInput
-            style={styles.input}
+            style={[styles.input, focusedInput === 'email' && styles.blurBorder]}
             keyboardType="email-address"
             placeholder="Адреса електронної пошти"
             placeholderTextColor={'#E8E8E8'}
             onChangeText={changeMethod}
-            value={value} />
+            value={value} 
+            onFocus={onFocus}
+            onBlur={onBlur}/>
     </>)
 };
 
@@ -26,6 +28,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F6F6F6'
     },
     blurBorder: {
-        borderColor: '#FF6C00'
+        borderColor: '#FF6C00',
+        backgroundColor: '#ffffff'
     }
 })
