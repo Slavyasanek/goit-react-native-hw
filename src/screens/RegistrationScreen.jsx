@@ -5,20 +5,23 @@ import { FormButton } from "../components/FornButton";
 import { EmailInput } from "../components/EmailInput";
 import { PasswordInput } from "../components/PasswordInput";
 import { Background } from "../components/Background";
+import { useNavigation } from "@react-navigation/native";
 
 export const RegistrationScreen = () => {
+    const navigation = useNavigation();
     const [login, setLogin] = useState('');
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
     const [focusedInput, setFocusedInput] = useState(null);
+    const [photo, setPhoto] = useState(null);
 
     const onSignUp = () => {
         if (email === '' || passwd === '' || login === '') {
             Alert.alert('Something is missed');
             return;
         }
-        Alert.alert(`data: login - ${login}, email - ${email}, passwd - ${passwd}`);
+        navigation.navigate('Home');
         setEmail('');
         setPasswd('');
         setLogin('');
@@ -26,45 +29,44 @@ export const RegistrationScreen = () => {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <SafeAreaView style={styles.container}>
-                <Background>
-                    <View style={styles.wrapper}>
-                        <View style={styles.avatar}>
-                            <Image
-                                source={null}
-                                style={styles.imageAvatar} />
-                            <TouchableOpacity
-                                style={styles.icon}>
-                                <Ionicons name="add-circle-outline"
-                                    size={25}
-                                    color={'#FF6C00'} />
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={styles.title}>Реєстрація</Text>
-                        <View style={styles.form}>
-                            <KeyboardAvoidingView
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.container}
+                keyboardVerticalOffset={-150}>
+                <SafeAreaView style={styles.container}>
+                    <Background>
+                        <View style={styles.wrapper}>
+                            <View style={styles.avatar}>
+                                <Image
+                                    source={photo}
+                                    style={styles.imageAvatar} />
+                                <TouchableOpacity
+                                    style={[styles.icon, photo && styles.iconDelete]}>
+                                    {!photo ? <Ionicons name="add-circle-outline"
+                                        size={25}
+                                        color={'#FF6C00'} />
+                                        : <Ionicons name="close-outline"
+                                            size={20}
+                                            color={'#BDBDBD'} />}
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.title}>Реєстрація</Text>
+                            <View style={styles.form}>
                                 <TextInput
                                     style={[styles.input, focusedInput === 'login' && styles.blurBorder]}
                                     keyboardType="default"
                                     placeholder="Логін"
-                                    placeholderTextColor={'#E8E8E8'}
+                                    placeholderTextColor={'#BDBDBD'}
                                     onChangeText={setLogin}
                                     value={login}
                                     onFocus={() => setFocusedInput('login')}
                                     onBlur={() => setFocusedInput(null)} />
-                            </KeyboardAvoidingView>
-                            <KeyboardAvoidingView
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                                 <EmailInput
                                     value={email}
                                     changeMethod={setEmail}
                                     onFocus={() => setFocusedInput('email')}
                                     onBlur={() => setFocusedInput(null)}
                                     focusedInput={focusedInput} />
-                            </KeyboardAvoidingView>
-                            <KeyboardAvoidingView
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                                 <PasswordInput
                                     changeMethod={setPasswd}
                                     value={passwd}
@@ -74,13 +76,14 @@ export const RegistrationScreen = () => {
                                     onBlur={() => setFocusedInput(null)}
                                     focusedInput={focusedInput}
                                 />
-                            </KeyboardAvoidingView>
+                            </View>
+                            <FormButton text={'Зареєструватися'} method={onSignUp} />
+                            <Text style={styles.link}
+                                onPress={() => navigation.navigate('Login')}>Вже є акаунт? Увійти</Text>
                         </View>
-                        <FormButton text={'Зареєструватися'} method={onSignUp} />
-                        <Text style={styles.link}>Вже є акаунт? Увійти</Text>
-                    </View>
-                </Background>
-            </SafeAreaView>
+                    </Background>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )
 };
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
         height: 120,
         borderRadius: 16,
         marginHorizontal: 'auto',
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     imageAvatar: {
         flex: 1,
@@ -121,12 +124,18 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: -12,
         bottom: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
         width: 25,
         height: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
         zIndex: 99,
         backgroundColor: '#FFFFFF',
+        borderRadius: 50
+    },
+    iconDelete: {
+        borderColor: '#E8E8E8',
+        borderWidth: 1,
+        borderStyle: 'solid'
     },
     title: {
         color: '#212121',

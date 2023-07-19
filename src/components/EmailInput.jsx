@@ -6,7 +6,7 @@ export const EmailInput = ({ value, changeMethod, onBlur, onFocus, focusedInput 
             style={[styles.input, focusedInput === 'email' && styles.blurBorder]}
             keyboardType="email-address"
             placeholder="Адреса електронної пошти"
-            placeholderTextColor={'#E8E8E8'}
+            placeholderTextColor={'#BDBDBD'}
             onChangeText={changeMethod}
             value={value} 
             onFocus={onFocus}

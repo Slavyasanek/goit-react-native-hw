@@ -1,9 +1,9 @@
 import { Text } from "react-native";
 
-export const PostsScreen = () => {
+export const CreatePostsScreen = () => {
     return (
         <>
-        <Text>Posts Screen</Text>
+        <Text>Create Posts Screen</Text>
         </>
     )
 };

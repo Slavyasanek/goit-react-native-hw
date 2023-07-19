@@ -4,8 +4,10 @@ import { FormButton } from "../components/FornButton";
 import { EmailInput } from "../components/EmailInput";
 import { PasswordInput } from "../components/PasswordInput";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 export const LoginScreen = () => {
+    const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [isPasswordHidden, setIsPasswordHidden] = useState(true);
@@ -16,29 +18,28 @@ export const LoginScreen = () => {
             Alert.alert('Something is missed');
             return;
         }
-        Alert.alert(`data: email - ${email}, passwd - ${passwd}`);
+        navigation.navigate('Home');
         setEmail('');
         setPasswd('');
     }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <SafeAreaView style={styles.container}>
-                <Background>
-                    <View style={styles.wrapper}>
-                        <Text style={styles.title}>Увійти</Text>
-                        <View style={styles.form}>
-                            <KeyboardAvoidingView
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.container}
+                keyboardVerticalOffset={-150}>
+                <SafeAreaView style={styles.container}>
+                    <Background>
+                        <View style={styles.wrapper}>
+                            <Text style={styles.title}>Увійти</Text>
+                            <View style={styles.form}>
                                 <EmailInput
                                     value={email}
                                     changeMethod={setEmail}
                                     onFocus={() => setFocusedInput('email')}
                                     onBlur={() => setFocusedInput(null)}
                                     focusedInput={focusedInput} />
-                            </KeyboardAvoidingView>
-                            <KeyboardAvoidingView
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                                 <PasswordInput
                                     changeMethod={setPasswd}
                                     value={passwd}
@@ -48,14 +49,15 @@ export const LoginScreen = () => {
                                     onBlur={() => setFocusedInput(null)}
                                     focusedInput={focusedInput}
                                 />
-                            </KeyboardAvoidingView>
+                            </View>
+                            <FormButton text={'Увійти'} method={onLogin} />
+                            <Text style={styles.link}
+                                onPress={() => navigation.navigate('Registration')}>Немає акаунту? Зареєструватися</Text>
                         </View>
-                        <FormButton text={'Увійти'} method={onLogin} />
-                        <Text style={styles.link}>Немає акаунту? Зареєструватися</Text>
-                    </View>
-                </Background>
-            </SafeAreaView>
-        </TouchableWithoutFeedback>)
+                    </Background>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback >)
 };
 
 const styles = StyleSheet.create({
@@ -66,8 +68,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         paddingTop: 32,
         paddingBottom: 111,
-        paddingRight: 15,
-        paddingLeft: 16,
+        paddingHorizontal: 15,
         position: 'relative',
         width: '100%',
         borderTopLeftRadius: 25,

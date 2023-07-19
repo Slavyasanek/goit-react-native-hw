@@ -8,7 +8,7 @@ export const PasswordInput = ({
     return (<View style={styles.loginContainer}>
         <TextInput
             style={[styles.input, focusedInput === 'password' && styles.blurBorder]}
-            placeholderTextColor={'#E8E8E8'}
+            placeholderTextColor={'#BDBDBD'}
             placeholder="Пароль"
             onChangeText={changeMethod}
             value={value}
