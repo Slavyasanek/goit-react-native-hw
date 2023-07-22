@@ -1,8 +1,8 @@
 import { SafeAreaView, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Alert } from "react-native";
-import { Background } from "../components/Background";
-import { FormButton } from "../components/FornButton";
-import { EmailInput } from "../components/EmailInput";
-import { PasswordInput } from "../components/PasswordInput";
+import { Background } from "../../components/Background";
+import { FormButton } from "../../components/FornButton";
+import { EmailInput } from "../../components/EmailInput";
+import { PasswordInput } from "../../components/PasswordInput";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
@@ -18,7 +18,10 @@ export const LoginScreen = () => {
             Alert.alert('Something is missed');
             return;
         }
-        navigation.navigate('Home');
+        navigation.reset({
+            index: 0,
+            routes: [{name: 'Home'}]
+        })
         setEmail('');
         setPasswd('');
     }
@@ -28,7 +31,7 @@ export const LoginScreen = () => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
-                keyboardVerticalOffset={-150}>
+                keyboardVerticalOffset={-100}>
                 <SafeAreaView style={styles.container}>
                     <Background>
                         <View style={styles.wrapper}>

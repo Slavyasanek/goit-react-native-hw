@@ -1,10 +1,10 @@
 import { StyleSheet, SafeAreaView, Image, View, Text, TextInput, Alert, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
-import { FormButton } from "../components/FornButton";
-import { EmailInput } from "../components/EmailInput";
-import { PasswordInput } from "../components/PasswordInput";
-import { Background } from "../components/Background";
+import { FormButton } from "../../components/FornButton";
+import { EmailInput } from "../../components/EmailInput";
+import { PasswordInput } from "../../components/PasswordInput";
+import { Background } from "../../components/Background";
 import { useNavigation } from "@react-navigation/native";
 
 export const RegistrationScreen = () => {
@@ -21,7 +21,10 @@ export const RegistrationScreen = () => {
             Alert.alert('Something is missed');
             return;
         }
-        navigation.navigate('Home');
+        navigation.reset({
+            index: 0,
+            routes: [{name: 'Home'}]
+        })
         setEmail('');
         setPasswd('');
         setLogin('');
@@ -32,7 +35,7 @@ export const RegistrationScreen = () => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
-                keyboardVerticalOffset={-150}>
+                keyboardVerticalOffset={-250}>
                 <SafeAreaView style={styles.container}>
                     <Background>
                         <View style={styles.wrapper}>
