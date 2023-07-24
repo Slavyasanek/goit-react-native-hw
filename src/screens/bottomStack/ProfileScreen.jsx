@@ -1,9 +1,19 @@
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 import { Text, StyleSheet, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import { Background } from '../../components/Background'
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
 import sample from '../../assets/ava_sample.jpg'
+import sample1 from '../../assets/sample1.jpg'
+import sample2 from '../../assets/sample2.jpg'
+import sample3 from '../../assets/sample3.jpg'
+import { Post } from "../../components/Post";
+
+const samples = [
+    { id: 1, photo: sample1, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
+    { id: 2, photo: sample2, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
+    { id: 3, photo: sample3, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 }
+]
 
 export const ProfileScreen = () => {
     const [photo, setPhoto] = useState(sample);
@@ -11,6 +21,9 @@ export const ProfileScreen = () => {
         <SafeAreaView style={styles.container}>
             <Background>
                 <View style={styles.wrapper}>
+                    <TouchableOpacity style={styles.iconLogOut}>
+                        <Feather name="log-out" size={24} color={'#BDBDBD'} />
+                    </TouchableOpacity>
                     <View style={styles.avatar}>
                         <Image
                             source={photo}
@@ -25,7 +38,12 @@ export const ProfileScreen = () => {
                                     color={'#BDBDBD'} />}
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.profileName}>Natalia</Text>
+                    <Text style={styles.profileName}>Natalia Romanova</Text>
+                    <FlatList
+                        style={styles.posts}
+                        data={samples}
+                        keyExtractor={(sample => sample.id)}
+                        renderItem={({ item }) => <Post item={item} />} />
                 </View>
             </Background>
         </SafeAreaView>
@@ -41,9 +59,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 25,
         borderTopLeftRadius: 25,
         paddingTop: 92,
-        paddingBottom: 78,
-        paddingRight: 15,
-        paddingLeft: 16,
+        marginTop: 190,
+        paddingHorizontal: 16,
         position: 'relative',
         width: '100%',
     },
@@ -63,6 +80,11 @@ const styles = StyleSheet.create({
         height: '100%',
         resizeMode: 'cover',
         borderRadius: 16,
+    },
+    iconLogOut: {
+        position: 'absolute',
+        top: 22,
+        right: 16
     },
     icon: {
         position: 'absolute',
@@ -86,6 +108,9 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto_500Medium',
         textAlign: 'center',
         fontSize: 30,
-        marginBottom: 32,
+        marginBottom: 10
+    },
+    posts: {
+        paddingTop: 20
     }
 })

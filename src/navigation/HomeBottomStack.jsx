@@ -7,12 +7,13 @@ import { PostsScreen } from "../screens/bottomStack/PostsScreen";
 import { ProfileScreen } from "../screens/bottomStack/ProfileScreen";
 import { CreatePostsScreen } from "../screens/bottomStack/CreatePostsScreen";
 
-const MainTab = createBottomTabNavigator();
+const HomeTab = createBottomTabNavigator();
 
-export const MainBottomStack = () => {
+export const HomeBottomStack = () => {
     const navigation = useNavigation();
     return (
-        <MainTab.Navigator
+        <HomeTab.Navigator
+        initialRouteName="Posts"
             screenOptions={() => ({
                 tabBarShowLabel: false,
                 tabBarActiveTintColor: '#FFFFFF',
@@ -23,7 +24,7 @@ export const MainBottomStack = () => {
                     justifyContent: 'center'
                 },
             })}>
-            <MainTab.Screen name="Posts" component={PostsScreen}
+            <HomeTab.Screen name="Posts" component={PostsScreen}
                 options={() => ({
                     tabBarIcon: ({ focused, size, color }) => (
                         <TouchableOpacity style={[styles.iconTab, focused && styles.activeIcon]}>
@@ -54,7 +55,7 @@ export const MainBottomStack = () => {
                         </TouchableOpacity>
                     )
                 })} />
-            <MainTab.Screen name="CreatePosts" component={CreatePostsScreen}
+            <HomeTab.Screen name="CreatePosts" component={CreatePostsScreen}
                 options={() => ({
                     tabBarIcon: ({ focused, size, color }) => (
                         <TouchableOpacity style={[styles.iconTab, focused && styles.activeIcon]}>
@@ -85,7 +86,7 @@ export const MainBottomStack = () => {
                         </TouchableOpacity>
                     )
                 })} />
-            <MainTab.Screen name="Profile" component={ProfileScreen}
+            <HomeTab.Screen name="Profile" component={ProfileScreen}
                 options={() => ({
                     tabBarIcon: ({ focused, size, color }) => (
                         <TouchableOpacity style={[styles.iconTab, focused && styles.activeIcon]}>
@@ -94,7 +95,7 @@ export const MainBottomStack = () => {
                     ),
                     headerShown: false
                 })} />
-        </MainTab.Navigator>
+        </HomeTab.Navigator>
     )
 };
 
