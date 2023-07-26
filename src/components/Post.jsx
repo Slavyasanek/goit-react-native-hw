@@ -27,7 +27,9 @@ export const Post = ({ item }) => {
 
 const styles = StyleSheet.create({
     post: {
-        marginBottom: 32
+        paddingBottom: 32,
+        backgroundColor: '#ffffff',
+        paddingHorizontal: 16
     },
     image: {
         width: '100%',

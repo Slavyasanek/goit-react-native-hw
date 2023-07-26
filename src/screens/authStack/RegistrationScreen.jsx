@@ -18,7 +18,6 @@ export const RegistrationScreen = () => {
 
     const onSignUp = () => {
         if (email === '' || passwd === '' || login === '') {
-            Alert.alert('Something is missed');
             return;
         }
         navigation.reset({

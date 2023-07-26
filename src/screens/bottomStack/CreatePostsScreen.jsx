@@ -20,12 +20,14 @@ export const CreatePostsScreen = () => {
                         <View style={styles.imageWrapper}>
                             <Image source={photo} style={styles.image} />
                         </View>
-                        <TouchableOpacity style={styles.buttonAdd} onPress={addPhoto}>
+                        <TouchableOpacity style={[styles.buttonAdd, 
+                            !photo ? {backgroundColor: '#ffffff'} 
+                            : {backgroundColor: 'rgba(255, 255, 255, 0.3)'}]} onPress={addPhoto}>
                             <Ionicons name="camera" size={24} color={photo ? '#FFFFFF' : '#BDBDBD'} />
                         </TouchableOpacity>
                     </View>
                 </View>
-                <Text style={styles.photoExistance}>{photo ? 'Редагувати фото' : 'Завантажити фото'}</Text>
+                <Text style={styles.photoExistance}>{photo ? 'Редагувати фото' : 'Завантажте фото'}</Text>
                 <View style={styles.form}>
                     <TextInput
                         placeholder="Назва..."
@@ -44,7 +46,7 @@ export const CreatePostsScreen = () => {
                     </View>
                 </View>
                 <TouchableOpacity style={[styles.publishBtn,
-                photo && title && location && { backgroundColor: '#FF6C00' }]}>
+                (photo && title && location) ? { backgroundColor: '#FF6C00' } : {backgroundColor: '#F6F6F6'}]}>
                     <Text style={[styles.publishBtnText,
                     photo && title && location && { color: '#FFFFFF' }]}>
                         Опублікувати</Text>
@@ -62,7 +64,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 16,
         paddingVertical: 30,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        backgroundColor: '#ffffff'
     },
     cameraContainer: {
         position: 'relative',
@@ -83,8 +86,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         position: 'absolute',
-        borderColor: '#FFFFFF',
-        borderWidth: 1,
+        resizeMode: 'cover',
     },
     image: {
         width: '100%',
@@ -93,7 +95,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     buttonAdd: {
-        backgroundColor: 'rgba(255, 255, 255, 0.3)',
         width: 60,
         height: 60,
         borderRadius: 50,
@@ -146,6 +147,12 @@ const styles = StyleSheet.create({
         color: '#BDBDBD'
     },
     deletBtn: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        backgroundColor: '#F6F6F6',
+        borderRadius: 20,
+        width: 70,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
