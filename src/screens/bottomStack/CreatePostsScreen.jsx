@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from "react-native";
 import sample from '../../assets/sample1.jpg'
 import { useState } from "react";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -13,49 +13,51 @@ export const CreatePostsScreen = () => {
         photo ? setPhoto(null) : setPhoto(sample)
     }
     return (
-        <View style={styles.container}>
-            <View>
-                <View style={styles.cameraContainer}>
-                    <View style={styles.camera}>
-                        <View style={styles.imageWrapper}>
-                            <Image source={photo} style={styles.image} />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <View style={{ flexGrow: 1 }}>
+                    <View style={styles.cameraContainer}>
+                        <View style={styles.camera}>
+                            <View style={styles.imageWrapper}>
+                                <Image source={photo} style={styles.image} />
+                            </View>
+                            <TouchableOpacity style={[styles.buttonAdd,
+                            !photo ? { backgroundColor: '#ffffff' }
+                                : { backgroundColor: 'rgba(255, 255, 255, 0.3)' }]} onPress={addPhoto}>
+                                <Ionicons name="camera" size={24} color={photo ? '#FFFFFF' : '#BDBDBD'} />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={[styles.buttonAdd, 
-                            !photo ? {backgroundColor: '#ffffff'} 
-                            : {backgroundColor: 'rgba(255, 255, 255, 0.3)'}]} onPress={addPhoto}>
-                            <Ionicons name="camera" size={24} color={photo ? '#FFFFFF' : '#BDBDBD'} />
-                        </TouchableOpacity>
                     </View>
-                </View>
-                <Text style={styles.photoExistance}>{photo ? 'Редагувати фото' : 'Завантажте фото'}</Text>
-                <View style={styles.form}>
-                    <TextInput
-                        placeholder="Назва..."
-                        style={styles.input}
-                        placeholderTextColor="#BDBDBD"
-                        value={title}
-                        onChangeText={setTitle} />
-                    <View style={styles.inputLocationContainer}>
+                    <Text style={styles.photoExistance}>{photo ? 'Редагувати фото' : 'Завантажте фото'}</Text>
+                    <KeyboardAvoidingView style={styles.form} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                         <TextInput
-                            placeholder="Місцевість..."
-                            style={[styles.input, styles.inputLocation]}
+                            placeholder="Назва..."
+                            style={styles.input}
                             placeholderTextColor="#BDBDBD"
-                            value={location}
-                            onChangeText={setLocation} />
-                        <Feather name="map-pin" size={20} color={'#BDBDBD'} style={styles.iconLocation} />
-                    </View>
+                            value={title}
+                            onChangeText={setTitle} />
+                        <View style={styles.inputLocationContainer}>
+                            <TextInput
+                                placeholder="Місцевість..."
+                                style={[styles.input, styles.inputLocation]}
+                                placeholderTextColor="#BDBDBD"
+                                value={location}
+                                onChangeText={setLocation} />
+                            <Feather name="map-pin" size={20} color={'#BDBDBD'} style={styles.iconLocation} />
+                        </View>
+                    </KeyboardAvoidingView>
+                    <TouchableOpacity style={[styles.publishBtn,
+                    (photo && title && location) ? { backgroundColor: '#FF6C00' } : { backgroundColor: '#F6F6F6' }]}>
+                        <Text style={[styles.publishBtnText,
+                        photo && title && location && { color: '#FFFFFF' }]}>
+                            Опублікувати</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={[styles.publishBtn,
-                (photo && title && location) ? { backgroundColor: '#FF6C00' } : {backgroundColor: '#F6F6F6'}]}>
-                    <Text style={[styles.publishBtnText,
-                    photo && title && location && { color: '#FFFFFF' }]}>
-                        Опублікувати</Text>
+                <TouchableOpacity style={styles.deletBtn}>
+                    <Feather name="trash-2" size={24} color={'#BDBDBD'} />
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.deletBtn}>
-                <Feather name="trash-2" size={24} color={'#BDBDBD'}/>
-            </TouchableOpacity>
-        </View>
+        </TouchableWithoutFeedback>
     )
 };
 
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 16,
         paddingVertical: 30,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         backgroundColor: '#ffffff'
     },
     cameraContainer: {
@@ -153,6 +155,7 @@ const styles = StyleSheet.create({
         width: 70,
         height: 40,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 10
     }
 })
