@@ -1,20 +1,28 @@
 import { Text, Image, StyleSheet, View, SafeAreaView, FlatList } from "react-native";
 import sample from '../../assets/ava_sample.jpg';
-import sample1 from '../../assets/sample1.jpg'
-import sample2 from '../../assets/sample2.jpg'
-import sample3 from '../../assets/sample3.jpg'
+// import sample1 from '../../assets/sample1.jpg'
+// import sample2 from '../../assets/sample2.jpg'
+// import sample3 from '../../assets/sample3.jpg'
 import { Post } from "../../components/Post";
-import { ScrollView } from "react-native-gesture-handler";
+import { useEffect, useState } from "react";
 
 const renderItem = ({ item }) => <Post item={item} />
 
-const samples = [
-    { id: 1, photo: sample1, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
-    { id: 2, photo: sample2, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
-    { id: 3, photo: sample3, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 }
-]
+// const samples = [
+//     { id: 1, photo: sample1, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
+//     { id: 2, photo: sample2, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
+//     { id: 3, photo: sample3, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 }
+// ]
 
-export const PostsScreen = () => {
+export const PostsScreen = ({route: {params}}) => {
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        if (params) {
+            setPosts(prevState => [...prevState, params]);
+        }
+    }, [params])
+
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
@@ -26,8 +34,7 @@ export const PostsScreen = () => {
                             <Text style={styles.userEmail}>email@example.com</Text>
                         </View>
                     </View>}
-                style={styles.posts}
-                data={samples}
+                data={posts}
                 keyExtractor={(sample => sample.id)}
                 renderItem={renderItem}
                 showsVerticalScrollIndicator={false} />
