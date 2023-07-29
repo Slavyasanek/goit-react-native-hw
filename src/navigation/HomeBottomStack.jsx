@@ -53,6 +53,7 @@ export const HomeBottomStack = () => {
                             <Ionicons name="add-outline" size={size} color={color} />
                         </TouchableOpacity>
                     ),
+                    unmountOnBlur: true,
                     tabBarStyle: {
                         display: 'none',
                     },

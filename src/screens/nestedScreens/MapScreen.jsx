@@ -11,6 +11,8 @@ export const MapScreen = () => {
             region={{
                 latitude: latitude,
                 longitude: longitude,
+                // latitude: 50.48970919824854, 
+                // longitude: 30.47152248518646,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
             }}

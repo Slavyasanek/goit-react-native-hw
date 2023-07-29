@@ -12,9 +12,26 @@ import { Post } from "../../components/Post";
 const renderItem = ({ item }) => <Post item={item} />
 
 const samples = [
-    { id: 1, photo: sample1, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
-    { id: 2, photo: sample2, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 },
-    { id: 3, photo: sample3, title: 'sample1', comments: 4, nav: 'Ukraine', likes: 100 }
+    {
+        id: 1, photo: sample1, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100, coordinates: {
+            latitude: 50.48970919824854,
+            longitude: 30.47152248518646,
+        }
+    },
+    {
+        id: 2, photo: sample2, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
+        coordinates: {
+            latitude: 50.48970919824854,
+            longitude: 30.47152248518646,
+        }
+    },
+    {
+        id: 3, photo: sample3, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
+        coordinates: {
+            latitude: 50.48970919824854,
+            longitude: 30.47152248518646,
+        }
+    }
 ]
 
 export const ProfileScreen = () => {

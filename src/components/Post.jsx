@@ -8,7 +8,7 @@ export const Post = ({ item }) => {
     const { photo, title, location, coordinates } = item;
 
     return (<View style={styles.post}>
-        <Image source={{uri: photo}} style={styles.image} />
+        <Image source={photo} style={styles.image} />
         <Text style={styles.title}>{title}</Text>
         <View style={styles.oddInfo}>
             <View style={styles.reactions}>

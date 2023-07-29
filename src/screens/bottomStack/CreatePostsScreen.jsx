@@ -6,11 +6,13 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
+import { nanoid } from "@reduxjs/toolkit";
 
 export const CreatePostsScreen = () => {
     const navigation = useNavigation();
     const [title, setTitle] = useState('');
     const [photo, setPhoto] = useState('');
+    const [focusedInput, setFocusedInput] = useState(null);
 
     const [location, setLocation] = useState('');
     const [coordinates, setCoordinates] = useState(null);
@@ -22,36 +24,42 @@ export const CreatePostsScreen = () => {
 
     useEffect(() => {
         (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            await MediaLibrary.requestPermissionsAsync();
-            setHasPermission(status === "granted");
+            try {
+                const { status } = await Camera.requestCameraPermissionsAsync();
+                await MediaLibrary.requestPermissionsAsync();
+                setHasPermission(status === "granted");
+            } catch (e) {
+                setHasPermission(false);
+                navigation.navigate("Posts");
+            }
         })();
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-              console.log("Permission to access location was denied");
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== "granted") {
+                    console.log("Permission to access location was denied");
+                }
+                let locationData = await Location.getCurrentPositionAsync({});
+                const coords = {
+                    latitude: locationData.coords.latitude,
+                    longitude: locationData.coords.longitude,
+                };
+                setCoordinates(coords);
+            } catch (error) {
+                navigation.navigate("Posts");
             }
-      
-            let locationData = await Location.getCurrentPositionAsync({});
-            const coords = {
-              latitude: locationData.coords.latitude,
-              longitude: locationData.coords.longitude,
-            };
-            setCoordinates(coords);
-          })();
+        })();
     }, []);
-
-    if (hasPermission === null) {
-        return <View />;
-    } else if (hasPermission === false) {
-        return <Text>Надайте доступ до камери</Text>;
-    }
 
     const takePhoto = async () => {
         if (cameraRef) {
-            const { uri } = await cameraRef.takePictureAsync();
-            await MediaLibrary.createAssetAsync(uri);
-            setPhoto(uri);
+            try {
+                const { uri } = await cameraRef.takePictureAsync();
+                await MediaLibrary.createAssetAsync(uri);
+                setPhoto(uri);
+            } catch (error) {
+                setPhoto('');
+            }
         }
     }
 
@@ -71,17 +79,19 @@ export const CreatePostsScreen = () => {
         setPhoto('');
         setTitle('');
         setLocation('');
-        setCoordinates('');
     }
 
     const sendPhoto = () => {
-        navigation.navigate("Posts", {photo, title, location, coordinates});
+        if (photo === '' || title === '' || location === '') return;
+        navigation.navigate("Posts", { photo, title, location, coordinates, id: nanoid() });
         deleteAll();
     }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.container}>
+            <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    keyboardVerticalOffset={90} style={styles.container}>
                 <View style={{ flexGrow: 1 }}>
                     <View style={styles.cameraContainer}>
                         <Camera style={styles.camera} ref={setCameraRef} type={type}>
@@ -101,35 +111,42 @@ export const CreatePostsScreen = () => {
                             <Ionicons name="repeat-outline" size={24} color={'#BDBDBD'} />
                         </TouchableOpacity>
                     </View>
-                    <KeyboardAvoidingView style={styles.form} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <View
+                    style={styles.form}>
                         <TextInput
                             placeholder="Назва..."
-                            style={styles.input}
+                            style={[styles.input, focusedInput === 'title' && styles.focusedInput]}
                             placeholderTextColor="#BDBDBD"
                             value={title}
-                            onChangeText={setTitle} />
+                            onChangeText={setTitle}
+                            onFocus={() => setFocusedInput('title')}
+                            onBlur={() => setFocusedInput(null)}
+                        />
                         <View style={styles.inputLocationContainer}>
                             <TextInput
                                 placeholder="Місцевість..."
-                                style={[styles.input, styles.inputLocation]}
+                                style={[styles.input, styles.inputLocation, focusedInput === 'location' && styles.focusedInput]}
                                 placeholderTextColor="#BDBDBD"
                                 value={location}
-                                onChangeText={setLocation} />
-                            <Feather name="map-pin" size={20} color={'#BDBDBD'} style={styles.iconLocation} />
+                                onChangeText={setLocation} 
+                                onFocus={() => setFocusedInput('location')}
+                                onBlur={() => setFocusedInput(null)}/>
+                            <Feather name="map-pin" size={20} color={ focusedInput === 'location'? '#FF6C00' : '#BDBDBD'} style={styles.iconLocation} />
                         </View>
-                    </KeyboardAvoidingView>
+                    </View>
                     <TouchableOpacity style={[styles.publishBtn,
                     (photo && title && location) ? { backgroundColor: '#FF6C00' } : { backgroundColor: '#F6F6F6' }]}
-                    onPress={sendPhoto}>
+                        onPress={sendPhoto}>
                         <Text style={[styles.publishBtnText,
                         photo && title && location && { color: '#FFFFFF' }]}>
                             Опублікувати</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.deletBtn} onPress={deleteAll}>
-                    <Feather name="trash-2" size={24} color={'#BDBDBD'} />
+                <TouchableOpacity style={[styles.deletBtn,
+                (photo && title && location) ? { backgroundColor: '#FF6C00' } : { backgroundColor: '#F6F6F6' }]} onPress={deleteAll}>
+                    <Feather name="trash-2" size={24} color={(photo && title && location) ? '#FFFFFF' :  '#BDBDBD'} />
                 </TouchableOpacity>
-            </View>
+            </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )
 };
@@ -201,6 +218,9 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         backgroundColor: '#FFFFFF',
     },
+    focusedInput: {
+        borderBottomColor: '#FF6C00',
+    },
     inputLocationContainer: {
         position: 'relative'
     },
@@ -227,12 +247,13 @@ const styles = StyleSheet.create({
     },
     deletBtn: {
         alignSelf: 'center',
-        backgroundColor: '#F6F6F6',
+        // backgroundColor: '#F6F6F6',
         borderRadius: 20,
         width: 70,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10
-    }
+        marginTop: 10,
+        marginBottom: 20,
+    },
 })

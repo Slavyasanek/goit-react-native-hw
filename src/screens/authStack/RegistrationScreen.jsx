@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, Image, View, Text, TextInput, Alert, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import { FormButton } from "../../components/FornButton";
@@ -34,8 +34,8 @@ export const RegistrationScreen = () => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
-                keyboardVerticalOffset={-250}>
-                <SafeAreaView style={styles.container}>
+                keyboardVerticalOffset={-100}>
+                <View style={styles.container}>
                     <Background>
                         <View style={styles.wrapper}>
                             <View style={styles.avatar}>
@@ -84,7 +84,7 @@ export const RegistrationScreen = () => {
                                 onPress={() => navigation.navigate('Login')}>Вже є акаунт? Увійти</Text>
                         </View>
                     </Background>
-                </SafeAreaView>
+                </View>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )

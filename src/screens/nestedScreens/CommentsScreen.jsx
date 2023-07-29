@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, StyleSheet, FlatList, View, TouchableWithoutFeedback, Image, TextInput, TouchableOpacity } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, FlatList, View, TouchableWithoutFeedback, Image, TextInput, TouchableOpacity } from "react-native";
 import sample1 from '../../assets/sample1.jpg';
 import ava from '../../assets/ava_sample.jpg';
 import { Text } from "react-native";
@@ -46,19 +46,22 @@ const samples = [{
 export const CommentsScreen = () => {
     const [commentText, setCommentText] = useState('');
 
-    return (<TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
+    return (<View style={styles.container}>
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={100}
             style={styles.mainWrapper}
-            keyboardVerticalOffset={-250}>
-            <View style={styles.imageWrapper}>
-                <Image source={sample1} style={styles.image} />
-            </View>
+        >
             <FlatList
                 data={samples}
-                style={{gap: 24}}
+                style={{ gap: 24 }}
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false}
+                ListHeaderComponent={
+                    <View style={styles.imageWrapper}>
+                        <Image source={sample1} style={styles.image} />
+                    </View>
+                }
                 renderItem={({ item }) => (
                     <View style={[styles.comment, item.id === 2 ? styles.simgleCommentAuthor : styles.singleComment]}>
                         <Image source={item.photo} style={styles.commentImage} />
@@ -87,7 +90,7 @@ export const CommentsScreen = () => {
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>)
+    </View>)
 };
 
 const styles = StyleSheet.create({
@@ -99,7 +102,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 16,
         paddingTop: 30,
-        paddingBottom: 16,
         backgroundColor: '#FFFFFF',
     },
     imageWrapper: {
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
     },
     form: {
         position: 'relative',
-        marginTop: 20,
+        marginVertical: 20,
     },
     btnSend: {
         position: 'absolute',

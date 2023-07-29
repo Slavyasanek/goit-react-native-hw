@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Alert } from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from "react-native";
 import { Background } from "../../components/Background";
 import { FormButton } from "../../components/FornButton";
 import { EmailInput } from "../../components/EmailInput";
@@ -15,7 +15,6 @@ export const LoginScreen = () => {
 
     const onLogin = () => {
         if (email === '' || passwd === '') {
-            Alert.alert('Something is missed');
             return;
         }
         navigation.reset({
@@ -32,7 +31,7 @@ export const LoginScreen = () => {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
                 keyboardVerticalOffset={-100}>
-                <SafeAreaView style={styles.container}>
+                <View style={styles.container}>
                     <Background>
                         <View style={styles.wrapper}>
                             <Text style={styles.title}>Увійти</Text>
@@ -58,7 +57,7 @@ export const LoginScreen = () => {
                                 onPress={() => navigation.navigate('Registration')}>Немає акаунту? Зареєструватися</Text>
                         </View>
                     </Background>
-                </SafeAreaView>
+                </View>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback >)
 };
