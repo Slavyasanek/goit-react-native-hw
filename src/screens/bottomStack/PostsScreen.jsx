@@ -4,6 +4,8 @@ import sample1 from '../../assets/sample1.jpg'
 import sample2 from '../../assets/sample2.jpg'
 import sample3 from '../../assets/sample3.jpg'
 import { Post } from "../../components/Post";
+import { useSelector } from "react-redux";
+import { selectAvatar, selectEmail, selectLogin } from "../../redux/selectors";
 // import { useEffect, useState } from "react";
 
 const renderItem = ({ item }) => <Post item={item} />
@@ -39,17 +41,21 @@ export const PostsScreen = ({ route: { params } }) => {
     //         setPosts(prevState => [...prevState, params]);
     //     }
     // }, [params])
+    const login = useSelector(selectLogin);
+    const avatar = useSelector(selectAvatar);
+    const email = useSelector(selectEmail);
+    console.log(avatar);
 
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
                 ListHeaderComponent={
                     <View style={styles.user}>
-                        <Image source={sample} style={styles.userImage} />
-                        <View>
-                            <Text style={styles.userName}>Natali Romanova</Text>
-                            <Text style={styles.userEmail}>email@example.com</Text>
-                        </View>
+                        {avatar && <Image source={{ uri: avatar }} style={styles.userImage} />}
+                        {login && email && <View>
+                            <Text style={styles.userName}>{login}</Text>
+                            <Text style={styles.userEmail}>{email}</Text>
+                        </View>}
                     </View>}
                 data={samples}
                 keyExtractor={(sample => sample.id)}

@@ -7,6 +7,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
 import { nanoid } from "@reduxjs/toolkit";
+import * as ImagePicker from 'expo-image-picker';
 
 export const CreatePostsScreen = () => {
     const navigation = useNavigation();
@@ -20,6 +21,7 @@ export const CreatePostsScreen = () => {
     const [hasPermission, setHasPermission] = useState(null);
     const [cameraRef, setCameraRef] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
+    const [isLoading, setIsLoading] = useState(false);
 
 
     useEffect(() => {
@@ -54,11 +56,14 @@ export const CreatePostsScreen = () => {
     const takePhoto = async () => {
         if (cameraRef) {
             try {
+                setIsLoading(true);
                 const { uri } = await cameraRef.takePictureAsync();
                 await MediaLibrary.createAssetAsync(uri);
                 setPhoto(uri);
             } catch (error) {
                 setPhoto('');
+            } finally {
+                setIsLoading(false);
             }
         }
     }
@@ -75,6 +80,18 @@ export const CreatePostsScreen = () => {
         );
     }
 
+    const loadPhoto = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+        if (!result.canceled) {
+            setPhoto(result.assets[0].uri);
+        }
+    }
+
     const deleteAll = () => {
         setPhoto('');
         setTitle('');
@@ -89,30 +106,37 @@ export const CreatePostsScreen = () => {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView 
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={90} style={styles.container}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={90} style={styles.container}>
                 <View style={{ flexGrow: 1 }}>
                     <View style={styles.cameraContainer}>
-                        <Camera style={styles.camera} ref={setCameraRef} type={type}>
-                            {photo && (<View style={styles.imageWrapper}>
+                        {photo ? (<View style={styles.camera}>
+                            <View style={styles.imageWrapper}>
                                 <Image source={{ uri: photo }} style={styles.image} />
-                            </View>)}
-                            <TouchableOpacity style={[styles.buttonAdd,
-                            !photo ? { backgroundColor: '#ffffff' }
-                                : { backgroundColor: 'rgba(255, 255, 255, 0.3)' }]} onPress={takePhoto}>
-                                <Ionicons name="camera" size={24} color={photo ? '#FFFFFF' : '#BDBDBD'} />
-                            </TouchableOpacity>
-                        </Camera>
+                            </View>
+                            <TouchableOpacity style={[styles.buttonAdd, { backgroundColor: 'rgba(255, 255, 255, 0.3)' }]} onPress={deletePhoto}>
+                                    {!isLoading ? <Ionicons name="camera" size={24} color={'#FFFFFF'} />
+                                        : <Ionicons name="time-outline" size={30} color={'#FFFFFF'} />}
+                                </TouchableOpacity>
+                        </View>) :
+                            (<Camera style={styles.camera} ref={setCameraRef} type={type}>
+                                <TouchableOpacity style={[styles.buttonAdd,
+                                { backgroundColor: '#ffffff' }]} onPress={takePhoto} disabled={isLoading ? true : false}>
+                                    {!isLoading ? <Ionicons name="camera" size={24} color={'#BDBDBD'} />
+                                        : <Ionicons name="time-outline" size={30} color={'#BDBDBD'} />}
+                                </TouchableOpacity>
+                            </Camera>
+                            )}
                     </View>
                     <View style={styles.photoEditors}>
-                        <Text style={styles.photoExistance} onPress={deletePhoto} disabled={!photo}>{photo ? 'Редагувати фото' : 'Завантажте фото'}</Text>
+                        <Text style={styles.photoExistance} onPress={loadPhoto} disabled={photo ? true : false}>{photo ? 'Редагувати фото' : 'Завантажте фото'}</Text>
                         <TouchableOpacity onPress={turnCamera}>
                             <Ionicons name="repeat-outline" size={24} color={'#BDBDBD'} />
                         </TouchableOpacity>
                     </View>
                     <View
-                    style={styles.form}>
+                        style={styles.form}>
                         <TextInput
                             placeholder="Назва..."
                             style={[styles.input, focusedInput === 'title' && styles.focusedInput]}
@@ -128,10 +152,10 @@ export const CreatePostsScreen = () => {
                                 style={[styles.input, styles.inputLocation, focusedInput === 'location' && styles.focusedInput]}
                                 placeholderTextColor="#BDBDBD"
                                 value={location}
-                                onChangeText={setLocation} 
+                                onChangeText={setLocation}
                                 onFocus={() => setFocusedInput('location')}
-                                onBlur={() => setFocusedInput(null)}/>
-                            <Feather name="map-pin" size={20} color={ focusedInput === 'location'? '#FF6C00' : '#BDBDBD'} style={styles.iconLocation} />
+                                onBlur={() => setFocusedInput(null)} />
+                            <Feather name="map-pin" size={20} color={focusedInput === 'location' ? '#FF6C00' : '#BDBDBD'} style={styles.iconLocation} />
                         </View>
                     </View>
                     <TouchableOpacity style={[styles.publishBtn,
@@ -144,7 +168,7 @@ export const CreatePostsScreen = () => {
                 </View>
                 <TouchableOpacity style={[styles.deletBtn,
                 (photo && title && location) ? { backgroundColor: '#FF6C00' } : { backgroundColor: '#F6F6F6' }]} onPress={deleteAll}>
-                    <Feather name="trash-2" size={24} color={(photo && title && location) ? '#FFFFFF' :  '#BDBDBD'} />
+                    <Feather name="trash-2" size={24} color={(photo && title && location) ? '#FFFFFF' : '#BDBDBD'} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>

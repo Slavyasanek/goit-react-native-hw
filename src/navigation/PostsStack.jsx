@@ -5,11 +5,15 @@ import { MapScreen } from "../screens/nestedScreens/MapScreen";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { logOut } from "../redux/operations";
 
 const PostsStackNavigator = createStackNavigator();
 
 export const PostsStack = () => {
+    const dispatch = useDispatch();
     const navigation = useNavigation();
+
     return (
         <PostsStackNavigator.Navigator initialRouteName="Posts"
             screenOptions={() => ({
@@ -32,36 +36,33 @@ export const PostsStack = () => {
                 options={() => ({
                     title: 'Публікації',
                     headerRight: () => (
-                        <TouchableOpacity style={styles.logOutIcon} onPress={() => navigation.reset({
-                            index: 0,
-                            routes: [{ name: 'Login' }]
-                        })}>
-                            <Feather name="log-out" size={24} color={'#BDBDBD'} />
+                        <TouchableOpacity style={styles.logOutIcon} onPress={() => dispatch(logOut())} >
+                    <Feather name="log-out" size={24} color={'#BDBDBD'} />
                         </TouchableOpacity>
-                    )
-                })} />
-            <PostsStackNavigator.Screen name="Comments" component={CommentsScreen}
-                options={() => ({
-                    title: 'Коментарі',
-                    headerLeft: () => (
-                        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.navigate('Posts')}>
-                            <Feather name="arrow-left" size={24} color={'rgba(33, 33, 33, 0.8)'} />
-                        </TouchableOpacity>
-                    ),
-                    tabBarStyle: {
-                        display: 'none',
-                    },
-                })} />
-            <PostsStackNavigator.Screen name="Map" component={MapScreen}
-                options={() => ({
-                    title: 'Мапа',
-                    headerLeft: () => (
-                        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
-                            <Feather name="arrow-left" size={24} color={'rgba(33, 33, 33, 0.8)'} />
-                        </TouchableOpacity>
-                    )
-                })} />
-        </PostsStackNavigator.Navigator>
+    )
+})} />
+    < PostsStackNavigator.Screen name = "Comments" component = { CommentsScreen }
+options = {() => ({
+    title: 'Коментарі',
+    headerLeft: () => (
+        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.navigate('Posts')}>
+            <Feather name="arrow-left" size={24} color={'rgba(33, 33, 33, 0.8)'} />
+        </TouchableOpacity>
+    ),
+    tabBarStyle: {
+        display: 'none',
+    },
+})} />
+    < PostsStackNavigator.Screen name = "Map" component = { MapScreen }
+options = {() => ({
+    title: 'Мапа',
+    headerLeft: () => (
+        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+            <Feather name="arrow-left" size={24} color={'rgba(33, 33, 33, 0.8)'} />
+        </TouchableOpacity>
+    )
+})} />
+        </PostsStackNavigator.Navigator >
     )
 };
 

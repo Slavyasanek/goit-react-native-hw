@@ -8,6 +8,10 @@ import sample1 from '../../assets/sample1.jpg'
 import sample2 from '../../assets/sample2.jpg'
 import sample3 from '../../assets/sample3.jpg'
 import { Post } from "../../components/Post";
+import { useDispatch, useSelector } from "react-redux";
+import { logOut, updateProfile } from "../../redux/operations";
+import { selectAvatar, selectLogin } from "../../redux/selectors";
+import * as ImagePicker from 'expo-image-picker';
 
 const renderItem = ({ item }) => <Post item={item} />
 
@@ -35,31 +39,54 @@ const samples = [
 ]
 
 export const ProfileScreen = () => {
-    const [photo, setPhoto] = useState(sample);
+    const dispatch = useDispatch();
+    const login = useSelector(selectLogin);
+    const avatar = useSelector(selectAvatar);
+
+    const deletePhoto = () => {
+        dispatch(updateProfile(null));
+    }
+
+    const renewPhoto = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+        if (!result.canceled) {
+            dispatch(updateProfile(result.assets[0].uri));
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <Background>
                 <FlatList
                     ListHeaderComponent={
                         <View style={styles.userInfoContainer}>
-                            <TouchableOpacity style={styles.iconLogOut}>
+                            <TouchableOpacity style={styles.iconLogOut} onPress={() => {
+                                dispatch(logOut())}}>
                                 <Feather name="log-out" size={24} color={'#BDBDBD'} />
                             </TouchableOpacity>
                             <View style={styles.avatar}>
-                                <Image
-                                    source={photo}
-                                    style={styles.imageAvatar} />
-                                <TouchableOpacity
-                                    style={[styles.icon, photo && styles.iconDelete]}>
-                                    {!photo ? <Ionicons name="add-circle-outline"
+                             {avatar && <Image
+                                    source={{uri: avatar}}
+                                    style={styles.imageAvatar} />}
+                                {!avatar ? <TouchableOpacity
+                                    style={[styles.icon]} onPress={renewPhoto}>
+                                    <Ionicons name="add-circle-outline"
                                         size={25}
                                         color={'#FF6C00'} />
-                                        : <Ionicons name="close-outline"
-                                            size={20}
-                                            color={'#BDBDBD'} />}
                                 </TouchableOpacity>
+                                : <TouchableOpacity style={[styles.icon, styles.iconDelete]}
+                                onPress={deletePhoto}>
+                                    <Ionicons name="close-outline"
+                                            size={20}
+                                            color={'#BDBDBD'} />
+                                </TouchableOpacity>}
                             </View>
-                            <Text style={styles.profileName}>Natalia Romanova</Text>
+                            <Text style={styles.profileName}>{login}</Text>
                         </View>
                     }
                     style={styles.posts}
