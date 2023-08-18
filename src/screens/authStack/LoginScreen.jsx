@@ -5,7 +5,7 @@ import { EmailInput } from "../../components/EmailInput";
 import { PasswordInput } from "../../components/PasswordInput";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../../redux/operations";
 
 export const LoginScreen = () => {

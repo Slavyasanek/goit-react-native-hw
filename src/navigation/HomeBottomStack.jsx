@@ -34,6 +34,7 @@ export const HomeBottomStack = () => {
                         </TouchableOpacity>
                     ),
                     headerShown: false,
+                    unmountOnBlur: true,
                     tabBarStyle: (route => {
                         const routeName = getFocusedRouteNameFromRoute(route) ?? '';
                         if (routeName === 'Comments' || routeName === 'Map') {
@@ -73,7 +74,7 @@ export const HomeBottomStack = () => {
                         lineHeight: 22
                     },
                     headerLeft: () => (
-                        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.navigate('Posts')}>
+                        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.navigate('PostsScreen')}>
                             <Feather name="arrow-left" size={24} color={'rgba(33, 33, 33, 0.8)'} />
                         </TouchableOpacity>
                     )
@@ -85,7 +86,8 @@ export const HomeBottomStack = () => {
                             <Feather name="user" size={size} color={color} />
                         </TouchableOpacity>
                     ),
-                    headerShown: false
+                    headerShown: false,
+                    unmountOnBlur: true,
                 })} />
         </HomeTab.Navigator>
     )

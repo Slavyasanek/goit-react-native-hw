@@ -2,46 +2,38 @@ import { FlatList, View } from "react-native";
 import { Text, StyleSheet, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import { Background } from '../../components/Background'
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { useState } from "react";
-import sample from '../../assets/ava_sample.jpg'
-import sample1 from '../../assets/sample1.jpg'
-import sample2 from '../../assets/sample2.jpg'
-import sample3 from '../../assets/sample3.jpg'
+import { useEffect, useState } from "react";
 import { Post } from "../../components/Post";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut, updateProfile } from "../../redux/operations";
-import { selectAvatar, selectLogin } from "../../redux/selectors";
+import { selectAvatar, selectId, selectLogin } from "../../redux/selectors";
 import * as ImagePicker from 'expo-image-picker';
+import { getUserPosts } from "../../firebase/firestore";
+import {Loader} from '../../components/Loader'
 
 const renderItem = ({ item }) => <Post item={item} />
-
-const samples = [
-    {
-        id: 1, photo: sample1, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100, coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    },
-    {
-        id: 2, photo: sample2, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
-        coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    },
-    {
-        id: 3, photo: sample3, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
-        coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    }
-]
 
 export const ProfileScreen = () => {
     const dispatch = useDispatch();
     const login = useSelector(selectLogin);
     const avatar = useSelector(selectAvatar);
+    const userId = useSelector(selectId);
+    const [posts, setPosts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchData = async () => {
+        try {
+            const dataPosts = await getUserPosts(userId);
+            setPosts(dataPosts)
+        } catch (error) {
+            return;
+        }
+        setIsLoading(false);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [])
 
     const deletePhoto = () => {
         dispatch(updateProfile(null));
@@ -61,6 +53,7 @@ export const ProfileScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            {iaLoading && <Loader/>}
             <Background>
                 <FlatList
                     ListHeaderComponent={
@@ -90,8 +83,8 @@ export const ProfileScreen = () => {
                         </View>
                     }
                     style={styles.posts}
-                    data={samples}
-                    keyExtractor={(sample => sample.id)}
+                    data={posts}
+                    keyExtractor={(post =>post.id)}
                     renderItem={renderItem}
                     showsVerticalScrollIndicator={false} />
             </Background>
@@ -103,12 +96,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    posts: {
+        flexGrow: 0,
+        // backgroundColor: '#ffffff',
+    },
     userInfoContainer: {
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
         alignItems: 'center',
         backgroundColor: '#ffffff',
-        marginTop: 150
+        marginTop: 150,
     },
     profileName: {
         fontFamily: 'Roboto_500Medium',

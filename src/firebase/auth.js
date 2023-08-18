@@ -12,7 +12,7 @@ export const registerDB = async (email, password, login, avatar) => {
         }
         return data.user;
     } catch (error) {
-        return error;
+        return;
     }    
 }
 
@@ -22,7 +22,8 @@ export const loginDB = async (email, password) => {
         console.log(data.user);
         return data.user
     } catch (error) {
-        return error;
+        console.log(error);
+        return;
     }
 };
 

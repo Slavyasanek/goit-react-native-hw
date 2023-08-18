@@ -1,96 +1,116 @@
-import { KeyboardAvoidingView, StyleSheet, FlatList, View, TouchableWithoutFeedback, Image, TextInput, TouchableOpacity } from "react-native";
-import sample1 from '../../assets/sample1.jpg';
-import ava from '../../assets/ava_sample.jpg';
-import { Text } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, FlatList, View, Image, TextInput, TouchableOpacity, Text, Keyboard } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectAvatar, selectEmail, selectId, selectLogin } from "../../redux/selectors";
+import { addComment } from "../../firebase/firestore";
+import { useRoute } from "@react-navigation/native";
+import { Loader } from "../../components/Loader";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
-
-const samples = [{
-    id: 1,
-    text: 'Really love your most recent photo. I’ve been trying to capture the same thing for a few months and would love some tips!',
-    date: '09 червня, 2020 | 08:40',
-    photo: sample1
-},
-{
-    id: 2,
-    text: 'A fast 50mm like f1.8 would help with the bokeh. I’ve been using primes as they tend to get a bit sharper images.',
-    date: '09 червня, 2020 | 08:40',
-    photo: ava
-},
-{
-    id: 3,
-    text: 'Thank you! That was very helpful!',
-    date: '09 червня, 2020 | 08:40',
-    photo: sample1
-},
-{
-    id: 4,
-    text: 'Thank you! That was very helpful!',
-    date: '09 червня, 2020 | 08:40',
-    photo: sample1
-},
-{
-    id: 5,
-    text: 'Thank you! That was very helpful!',
-    date: '09 червня, 2020 | 08:40',
-    photo: sample1
-},
-{
-    id: 6,
-    text: 'Thank you! That was very helpful!',
-    date: '09 червня, 2020 | 08:40',
-    photo: sample1
-}
-]
 export const CommentsScreen = () => {
     const [commentText, setCommentText] = useState('');
+    const [comments, setComments] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const userId = useSelector(selectId);
+    const avatar = useSelector(selectAvatar);
+    const email = useSelector(selectEmail);
+    const login = useSelector(selectLogin);
+    const { params: { postId, photo } } = useRoute()
 
-    return (<View style={styles.container}>
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={100}
-            style={styles.mainWrapper}
-        >
-            <FlatList
-                data={samples}
-                style={{ gap: 24 }}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={
-                    <View style={styles.imageWrapper}>
-                        <Image source={sample1} style={styles.image} />
-                    </View>
-                }
-                renderItem={({ item }) => (
-                    <View style={[styles.comment, item.id === 2 ? styles.simgleCommentAuthor : styles.singleComment]}>
-                        <Image source={item.photo} style={styles.commentImage} />
-                        <View style={[styles.commentWrapper, item.id === 2 && styles.commentWrapperAuthor]}>
-                            <Text style={styles.commentText}>
-                                {item.text}
-                            </Text>
-                            <Text style={[styles.commentDate, item.id === 2 && styles.commentDateAuthor]}>
-                                {item.date}
-                            </Text>
+    const fetchComments = async () => {
+        const commentsQuery = query(collection(db, 'posts', `${postId}`, 'comments'), orderBy('createdDate'));
+        const unsubscribe = onSnapshot(commentsQuery, (snapshot) => {
+            const updatedComments = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setComments(updatedComments);
+            setIsLoading(false)
+        });
+
+        return () => unsubscribe();
+    }
+
+    useEffect(() => {
+        fetchComments();
+    }, [])
+
+    const formatDate = (date) => {
+        const dateToFormat = new Date(date);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = dateToFormat.toLocaleDateString('uk-UA', options);
+        const formattedTime = `${dateToFormat.getHours()}:${dateToFormat.getMinutes()}`
+        return `${formattedDate} | ${formattedTime}`
+    }
+
+    const addCommentUser = async () => {
+        try {
+            const today = Date.now();
+            const newComment = {
+                authorId: userId,
+                avatar,
+                email,
+                login,
+                commentText,
+                createdDate: formatDate(today)
+            }
+            await addComment(postId, newComment);
+            Keyboard.dismiss();
+            // fetchComments();
+            setCommentText('');
+        } catch (error) {
+            return;
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            {isLoading === true && <Loader />}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={100}
+                style={styles.mainWrapper}>
+                <FlatList
+                    data={comments}
+                    style={{ gap: 24 }}
+                    keyExtractor={(item) => item.id}
+                    showsVerticalScrollIndicator={false}
+                    ListHeaderComponent={
+                        <View style={styles.imageWrapper}>
+                            <Image source={{ uri: photo }} style={styles.image} />
                         </View>
-                    </View>
+                    }
+                    renderItem={({ item }) => (
+                        <View style={[styles.comment, item.authorId === userId ? styles.simgleCommentAuthor : styles.singleComment]}>
+                            <Image source={{ uri: item.avatar }} style={styles.commentImage} />
+                            <View style={[styles.commentWrapper, item.authorId === userId && styles.commentWrapperAuthor]}>
+                                <Text style={styles.commentText}>
+                                    {item.commentText}
+                                </Text>
+                                <Text style={[styles.commentDate, item.authorId === userId && styles.commentDateAuthor]}>
+                                    {item.createdDate}
+                                </Text>
+                            </View>
+                        </View>
 
-                )}
-            />
-            <View style={styles.form}>
-                <TextInput
-                    placeholder="Коментувати..."
-                    placeholderTextColor={'#BDBDBD'}
-                    style={styles.input}
-                    value={commentText}
-                    onChangeText={setCommentText}
+                    )}
                 />
-                <TouchableOpacity style={styles.btnSend}>
-                    <Feather name="arrow-up" size={20} color={'#fff'} />
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
-    </View>)
+                <View style={styles.form}>
+                    <TextInput
+                        placeholder="Коментувати..."
+                        placeholderTextColor={'#BDBDBD'}
+                        style={styles.input}
+                        value={commentText}
+                        onChangeText={setCommentText}
+                    />
+                    <TouchableOpacity style={styles.btnSend} onPress={addCommentUser}>
+                        <Feather name="arrow-up" size={20} color={'#fff'} />
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
+        </View>)
 };
 
 const styles = StyleSheet.create({

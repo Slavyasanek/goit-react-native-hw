@@ -1,54 +1,44 @@
 import { Text, Image, StyleSheet, View, SafeAreaView, FlatList } from "react-native";
-import sample from '../../assets/ava_sample.jpg';
-import sample1 from '../../assets/sample1.jpg'
-import sample2 from '../../assets/sample2.jpg'
-import sample3 from '../../assets/sample3.jpg'
 import { Post } from "../../components/Post";
 import { useSelector } from "react-redux";
 import { selectAvatar, selectEmail, selectLogin } from "../../redux/selectors";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { postsRef } from "../../firebase/firestore";
+import { Loader } from "../../components/Loader";
+import { orderBy, query, onSnapshot, getDocs, collection } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 const renderItem = ({ item }) => <Post item={item} />
 
-const samples = [
-    {
-        id: 1, photo: sample1, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100, coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    },
-    {
-        id: 2, photo: sample2, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
-        coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    },
-    {
-        id: 3, photo: sample3, title: 'sample1', comments: 4, location: 'Ukraine', likes: 100,
-        coordinates: {
-            latitude: 50.48970919824854,
-            longitude: 30.47152248518646,
-        }
-    }
-]
-
-export const PostsScreen = ({ route: { params } }) => {
-    // const [posts, setPosts] = useState([]);
-
-    // useEffect(() => {
-    //     if (params) {
-    //         setPosts(prevState => [...prevState, params]);
-    //     }
-    // }, [params])
+export const PostsScreen = () => {
+    const [posts, setPosts] = useState([]);
     const login = useSelector(selectLogin);
     const avatar = useSelector(selectAvatar);
     const email = useSelector(selectEmail);
-    console.log(avatar);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchData = async () => {
+        const q = query(postsRef, orderBy('createdDate', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const updatedPosts = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setPosts(updatedPosts);
+            setIsLoading(false);
+        });
+        
+        return () => unsubscribe();
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
-            <FlatList
+            {isLoading === true && <Loader />}
+            {posts.length !== 0 && <FlatList
                 ListHeaderComponent={
                     <View style={styles.user}>
                         {avatar && <Image source={{ uri: avatar }} style={styles.userImage} />}
@@ -57,10 +47,10 @@ export const PostsScreen = ({ route: { params } }) => {
                             <Text style={styles.userEmail}>{email}</Text>
                         </View>}
                     </View>}
-                data={samples}
-                keyExtractor={(sample => sample.id)}
+                data={posts}
+                keyExtractor={(posts => posts.id)}
                 renderItem={renderItem}
-                showsVerticalScrollIndicator={false} />
+                showsVerticalScrollIndicator={false} />}
         </SafeAreaView>
     )
 };

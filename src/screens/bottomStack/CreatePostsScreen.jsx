@@ -6,8 +6,13 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
-import { nanoid } from "@reduxjs/toolkit";
 import * as ImagePicker from 'expo-image-picker';
+import { useSelector } from "react-redux";
+import { selectId } from "../../redux/selectors";
+import { addPost } from "../../firebase/firestore";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { storage } from "../../firebase/config";
+import { Loader } from "../../components/Loader";
 
 export const CreatePostsScreen = () => {
     const navigation = useNavigation();
@@ -22,6 +27,7 @@ export const CreatePostsScreen = () => {
     const [cameraRef, setCameraRef] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [isLoading, setIsLoading] = useState(false);
+    const userId = useSelector(selectId);
 
 
     useEffect(() => {
@@ -98,14 +104,37 @@ export const CreatePostsScreen = () => {
         setLocation('');
     }
 
-    const sendPhoto = () => {
+    const sendPhoto = async () => {
         if (photo === '' || title === '' || location === '') return;
-        navigation.navigate("Posts", { photo, title, location, coordinates, id: nanoid() });
+
+        setIsLoading(true);
+        const response = await fetch(photo);
+        const file = await response.blob();
+        const photoId = Date.now().toString();
+        const refPath = ref(storage, `image/${photoId}`);
+        const upload = await uploadBytesResumable(refPath, file);
+        const downloadURL = await getDownloadURL(upload.ref);
+        const newPost = {
+            photo: downloadURL,
+            title,
+            location,
+            coordinates,
+            likes: {
+                people: [],
+                amount: 0
+            },
+            userId,
+            createdDate: Date.now()
+        }
+        await addPost(newPost);
+        navigation.navigate("PostsScreen");
         deleteAll();
+        setIsLoading(false);
     }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            {isLoading === true && photo && <Loader/>}
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={90} style={styles.container}>
@@ -116,9 +145,9 @@ export const CreatePostsScreen = () => {
                                 <Image source={{ uri: photo }} style={styles.image} />
                             </View>
                             <TouchableOpacity style={[styles.buttonAdd, { backgroundColor: 'rgba(255, 255, 255, 0.3)' }]} onPress={deletePhoto}>
-                                    {!isLoading ? <Ionicons name="camera" size={24} color={'#FFFFFF'} />
-                                        : <Ionicons name="time-outline" size={30} color={'#FFFFFF'} />}
-                                </TouchableOpacity>
+                                {!isLoading ? <Ionicons name="camera" size={24} color={'#FFFFFF'} />
+                                    : <Ionicons name="time-outline" size={30} color={'#FFFFFF'} />}
+                            </TouchableOpacity>
                         </View>) :
                             (<Camera style={styles.camera} ref={setCameraRef} type={type}>
                                 <TouchableOpacity style={[styles.buttonAdd,

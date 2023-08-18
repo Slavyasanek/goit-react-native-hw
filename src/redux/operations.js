@@ -34,6 +34,7 @@ export const signIn = createAsyncThunk('auth/signin',
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
         }
+        
     })
 export const logOut = createAsyncThunk('auth/logout',
     async (_, thunkAPI) => {
